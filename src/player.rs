@@ -2,11 +2,9 @@ use crate::entity;
 
 pub struct Player {
     name: String,
-    hp: i32,
-    pw: i32,
     x_pos: u32,
     y_pos: u32,
-    invent: Vec<Box<dyn entity::Item>>,
+    invent: Vec<entity::Item>,
 }
 
 impl Player {
@@ -14,8 +12,6 @@ impl Player {
     {
         Self {
             name: String::new(),
-            hp: 0,
-            pw: 0,
             x_pos: 0,
             y_pos: 0,
             invent: Vec::new(),

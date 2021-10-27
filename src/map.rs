@@ -3,7 +3,6 @@ use crate::entity;
 
 pub struct Map {
     grid: Vec<Vec<u8>>,
-    objects: Vec<Box<dyn entity::Entity>>,
     start_y: u32,
     start_x: u32,
     fin_y: u32,
@@ -15,7 +14,6 @@ impl Map {
     {
         Self {
             grid: Vec::new(),
-            objects: Vec::new(),
             start_y: 0,
             start_x: 0,
             fin_y: 0,
@@ -78,18 +76,6 @@ impl Map {
             }
         }
 
-//        let ent_count   = f.read_u32::<LittleEndian>()?; // TODO
-
-//        for _ent_i in 0..ent_count
-//        {
-//            ()
-//        }
-
-        Ok(())
-    }
-
-    pub fn store(&self) -> Result <(), std::io::Error> // TODO
-    {
         Ok(())
     }
 }

@@ -1,10 +1,7 @@
-use crate::map;
-use crate::player;
+use crate::map::Map;
 
 pub struct Game {
-    maps: Vec<map::Map>,
-    cur_map: usize,
-    player: player::Player,
+    maps: Vec<Map>,
 }
 
 impl Game {
@@ -12,17 +9,15 @@ impl Game {
     {
         Self {
             maps: Vec::new(),
-            cur_map: 0,
-            player: player::Player::new(),
         }
     }
 
-    pub fn init_maps(&mut self, map_paths: Vec<&str>)
+    pub fn load_maps(&mut self, map_paths: Vec<&str>)
     {
         for m_path in &map_paths
         {
             self.maps.push(
-                map::Map::from_file(m_path).unwrap()
+                Map::from_file(m_path).unwrap()
             )
         }
 

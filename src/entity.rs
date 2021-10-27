@@ -1,14 +1,10 @@
 pub trait Entity {
     fn name(&self) -> &str;
-    // id // TODO
-    // symbol // TODO
-    // type // TODO Returns enum that has type-specific methods & attributes.
     fn pos(&self) -> (u32, u32);
     fn place(&mut self, y: u32, x: u32);
 }
 
-pub trait Item : Entity {
-    fn weight(&self) -> i32;
+pub struct Item {
 }
 
 pub struct Mob {
@@ -29,10 +25,6 @@ impl Mob {
             x_pos: 0,
             y_pos: 0,
         }
-    }
-
-    fn attack(&self, enemy: Mob) // TODO
-    {
     }
 }
 
