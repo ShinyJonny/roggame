@@ -5,5 +5,6 @@ mod player;
 
 fn main()
 {
-    let player = player::Player::new();
+    let mut g = game::Game::new();
+    g.init_maps(vec!["map.dat", "map.dat"]);
 }

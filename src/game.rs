@@ -19,20 +19,24 @@ impl Game {
 
     pub fn init_maps(&mut self, map_paths: Vec<&str>)
     {
-        for m_path in &map_paths {
+        for m_path in &map_paths
+        {
             self.maps.push(
                 map::Map::from_file(m_path).unwrap()
             )
         }
+
+        for m in &self.maps
+        {
+            m.dump_grid();
+        }
     }
 
-    pub fn init_player(&mut self)
+    pub fn init_player(&mut self) // TODO
     {
-        self.player.init();
     }
 
-    pub fn start(&mut self)
+    pub fn start(&mut self) // TODO
     {
-        // TODO
     }
 }

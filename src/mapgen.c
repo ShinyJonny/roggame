@@ -15,6 +15,7 @@ struct Header {
 
 void write_header(FILE * file, struct Header *header);
 void write_randombyte_map(FILE * file, long y, long x);
+void write_numberfield_map(FILE * file, long y, long x);
 
 int main(int argc, char *argv[])
 {
@@ -59,7 +60,7 @@ int main(int argc, char *argv[])
 	h.finish_x = 0;
 
 	write_header(file, &h);
-	write_randombyte_map(file, y, x);
+	write_numberfield_map(file, y, x);
 
 	return 0;
 }
@@ -86,5 +87,16 @@ void write_randombyte_map(FILE * file, long y, long x)
 		byte = (long) rand();
 
 		fwrite((void *) &byte, 1, 1, file);
+	}
+}
+
+void write_numberfield_map(FILE * file, long y, long x)
+{
+	for (long i = 0; i < y; i++)
+	{
+		for (long j = 0; j < x; j++)
+		{
+			fwrite((unsigned char *) &i, 1, 1, file);
+		}
 	}
 }

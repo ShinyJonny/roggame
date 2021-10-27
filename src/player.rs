@@ -21,11 +21,6 @@ impl Player {
             invent: Vec::new(),
         }
     }
-
-    pub fn init(&mut self)
-    {
-        // TODO
-    }
 }
 
 impl entity::Entity for Player {
@@ -38,5 +33,9 @@ impl entity::Entity for Player {
     {
         self.x_pos = x;
         self.y_pos = y;
+    }
+
+    fn name(&self) -> &str {
+        &self.name
     }
 }
