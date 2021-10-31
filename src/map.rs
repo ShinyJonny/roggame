@@ -1,5 +1,4 @@
 use byteorder::{LittleEndian, ReadBytesExt};
-use crate::entity;
 
 pub struct Map {
     grid: Vec<Vec<u8>>,

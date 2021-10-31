@@ -20,7 +20,7 @@ void write_numberfield_map(FILE * file, long y, long x);
 int main(int argc, char *argv[])
 {
 	if (argc != 4) {
-		fprintf(stderr, "%s: invalid argument count: %d", argv[0], argc - 1);
+		fprintf(stderr, "%s: invalid argument count: %d\n", argv[0], argc);
 		return -1;
 	}
 
@@ -30,21 +30,21 @@ int main(int argc, char *argv[])
 	uint32_t y = atoi(argv[2]);
 
 	if (y <= 0) {
-		fprintf(stderr, "%s: invalid height: %s", argv[0], argv[2]);
+		fprintf(stderr, "%s: invalid height: %s\n", argv[0], argv[2]);
 		return -1;
 	}
 
 	uint32_t x = atoi(argv[3]);
 
 	if (x <= 1) {
-		fprintf(stderr, "%s: invalid width: %s", argv[0], argv[3]);
+		fprintf(stderr, "%s: invalid width: %s\n", argv[0], argv[3]);
 		return -1;
 	}
 
 	FILE *file = fopen(file_path, "wb");
 
 	if (!file) {
-		fprintf(stderr, "%s: could't open file: %s", argv[0], argv[1]);
+		fprintf(stderr, "%s: could't open file: %s\n", argv[0], argv[1]);
 		return -1;
 	}
 
