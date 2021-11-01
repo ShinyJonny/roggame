@@ -17,17 +17,17 @@ impl Game {
     {
         let mut screen = Screen::new(HEIGHT, WIDTH);
 
-        let main_frame =  screen.add_widget(0, 0, HEIGHT, WIDTH);
-        screen.w_set_border(&main_frame, ('#', '#', '#', '#', '#', '#'));
-        screen.w_toggle_border(&main_frame);
-        screen.w_set_zindex(&main_frame, 0);
+        let mut main_frame =  screen.add_widget(0, 0, HEIGHT, WIDTH);
+        main_frame.set_border(('#', '#', '#', '#', '#', '#'));
+        main_frame.toggle_border();
+        main_frame.set_zindex(0);
 
         let view = screen.add_widget(1, 1, HEIGHT - 2 - 2, WIDTH - 2);
-        let spacer = screen.add_widget(HEIGHT - 1 - 2, 1, 1, WIDTH - 2);
+        let mut spacer = screen.add_widget(HEIGHT - 1 - 2, 1, 1, WIDTH - 2);
         let status_bar = screen.add_widget(HEIGHT - 1 - 1, 1, 1, WIDTH - 2);
 
-        screen.w_set_border(&spacer, ('#', '\0', '#', '#', '\0', '\0'));
-        screen.w_toggle_border(&spacer);
+        spacer.set_border(('#', '\0', '#', '#', '\0', '\0'));
+        spacer.toggle_border();
 
         Self {
             screen,
