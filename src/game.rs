@@ -1,15 +1,16 @@
 use crate::map::Map;
-use crate::screen::{Screen, WidgetHandle};
+use crate::screen::{Screen, Widget};
 
-const WIDTH: u32  = 80;
-const HEIGHT: u32 = 24;
+const WIDTH: usize  = 80;
+const HEIGHT: usize = 24;
 
 pub struct Game {
     screen: Screen,
     maps: Vec<Map>,
-    view: WidgetHandle,
-    spacer: WidgetHandle,
-    status_bar: WidgetHandle,
+    main_frame: Widget,
+    display: Widget,
+    spacer: Widget,
+    status_bar: Widget,
 }
 
 impl Game {
@@ -22,9 +23,9 @@ impl Game {
         main_frame.toggle_border();
         main_frame.set_zindex(0);
 
-        let view = screen.add_widget(1, 1, HEIGHT - 2 - 2, WIDTH - 2);
-        let mut spacer = screen.add_widget(HEIGHT - 1 - 2, 1, 1, WIDTH - 2);
-        let status_bar = screen.add_widget(HEIGHT - 1 - 1, 1, 1, WIDTH - 2);
+        let display = screen.add_widget(1, 1, HEIGHT - 2 - 2, WIDTH - 2);
+        let mut spacer = screen.add_widget(HEIGHT as u32 - 1 - 2, 1, 1, WIDTH - 2);
+        let status_bar = screen.add_widget(HEIGHT as u32 - 1 - 1, 1, 1, WIDTH - 2);
 
         spacer.set_border(('#', '\0', '#', '#', '\0', '\0'));
         spacer.toggle_border();
@@ -32,7 +33,8 @@ impl Game {
         Self {
             screen,
             maps: Vec::new(),
-            view,
+            main_frame,
+            display,
             spacer,
             status_bar,
         }
@@ -40,8 +42,7 @@ impl Game {
 
     pub fn load_maps(&mut self, map_paths: Vec<&str>)
     {
-        for m_path in &map_paths
-        {
+        for m_path in &map_paths {
             self.maps.push(
                 Map::from_file(m_path).unwrap()
             )
@@ -50,6 +51,30 @@ impl Game {
 
     pub fn init_player(&mut self) // TODO
     {
+        let msg = "What is your name?";
+
+        let h: u32;
+        let w: u32;
+
+        {
+            let d = self.display.borrow();
+            h = d.height as u32;
+            w = d.width as u32;
+        }
+
+        self.display.print(
+            (h - 5) / 2 + 2,
+            (w - msg.len() as u32) / 2,
+            msg
+        );
+
+        let msg = ">_____________________________";
+
+        self.display.print(
+            (h - 5) / 2 + 4 + 2,
+            (w - msg.len() as u32) / 2,
+            msg
+        );
     }
 
     pub fn start(&mut self) // TODO
