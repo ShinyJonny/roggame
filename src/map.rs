@@ -42,10 +42,8 @@ impl Map {
 
     pub fn dump_grid(&self)
     {
-        for row in &self.grid
-        {
-            for col in row
-            {
+        for row in &self.grid {
+            for col in row {
                 print!("{:02?}", col);
             }
             println!();
@@ -65,12 +63,10 @@ impl Map {
 
         self.grid = Vec::with_capacity(max_y);
 
-        for row in 0..max_y
-        {
+        for row in 0..max_y {
             self.grid.push(Vec::with_capacity(max_x));
 
-            for _col in 0..max_x
-            {
+            for _col in 0..max_x {
                 self.grid[row].push(f.read_u8()?);
             }
         }
