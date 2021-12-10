@@ -81,8 +81,7 @@ void write_randombyte_map(FILE * file, long y, long x)
 {
 	long byte;
 
-	for (long i = 0; i < y * x; i++)
-	{
+	for (long i = 0; i < y * x; i++) {
 		srand(clock());
 		byte = (long) rand();
 
@@ -92,10 +91,8 @@ void write_randombyte_map(FILE * file, long y, long x)
 
 void write_numberfield_map(FILE * file, long y, long x)
 {
-	for (long i = 0; i < y; i++)
-	{
-		for (long j = 0; j < x; j++)
-		{
+	for (long i = 0; i < y; i++) {
+		for (long j = 0; j < x; j++) {
 			fwrite((unsigned char *) &i, 1, 1, file);
 		}
 	}
