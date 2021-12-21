@@ -1,5 +1,6 @@
 use crate::map::Map;
-use crate::screen::{Screen, Widget};
+use crate::screen::Screen;
+use crate::widget::Widget;
 
 const WIDTH: usize  = 80;
 const HEIGHT: usize = 24;
@@ -14,7 +15,7 @@ pub struct Game {
 }
 
 impl Game {
-    pub fn init() -> Self
+    pub fn new() -> Self
     {
         let mut screen = Screen::new(HEIGHT, WIDTH);
 
@@ -51,21 +52,15 @@ impl Game {
 
     pub fn init_player(&mut self) // TODO
     {
+        let w = self.display.content_width() as u32;
+        let h = self.display.content_height() as u32;
+
         let msg = "What is your name?";
-
-        let h: u32;
-        let w: u32;
-
-        {
-            let d = self.display.borrow();
-            h = d.height as u32;
-            w = d.width as u32;
-        }
 
         self.display.print(
             (h - 5) / 2 + 2,
             (w - msg.len() as u32) / 2,
-            msg
+            msg,
         );
 
         let msg = ">_____________________________";
@@ -75,11 +70,18 @@ impl Game {
             (w - msg.len() as u32) / 2,
             msg
         );
+
     }
 
     pub fn start(&mut self) // TODO
     {
-        self.screen.draw();
-        self.screen.refresh();
+        self.screen.init();
+
+        for _ in 0..60 {
+            self.screen.draw();
+            self.screen.refresh();
+        }
+
+        std::thread::sleep(std::time::Duration::from_millis(3000));
     }
 }
