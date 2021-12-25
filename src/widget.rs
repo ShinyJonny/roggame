@@ -39,7 +39,7 @@ impl Widget {
 
     pub fn content_width(&self) -> usize
     {
-        let w = self.w.borrow();
+        let w = self.borrow();
 
         if w.has_border {
             w.width - 2
@@ -50,7 +50,7 @@ impl Widget {
 
     pub fn content_height(&self) -> usize
     {
-        let w = self.w.borrow();
+        let w = self.borrow();
 
         if w.has_border {
             w.height - 2
@@ -61,7 +61,7 @@ impl Widget {
 
     pub fn content_yx(&self) -> (u32, u32)
     {
-        let w = self.w.borrow();
+        let w = self.borrow();
 
         if w.has_border {
             (w.start_y, w.start_x)
@@ -74,12 +74,12 @@ impl Widget {
     // bottom-right corner)
     pub fn set_border(&mut self, border: (char, char, char, char, char, char))
     {
-        self.w.borrow_mut().border_style = border;
+        self.borrow_mut().border_style = border;
     }
 
     pub fn toggle_border(&mut self) -> Result<(), ()>
     {
-        let mut w = self.w.borrow_mut();
+        let mut w = self.borrow_mut();
 
         if w.width < 2 || w.height < 2 {
             return Err(());
@@ -96,12 +96,12 @@ impl Widget {
 
     pub fn set_zindex(&mut self, z_index: u32)
     {
-        self.w.borrow_mut().z_index = z_index;
+        self.borrow_mut().z_index = z_index;
     }
 
     pub fn print(&mut self, mut y: u32, mut x: u32, line: &str)
     {
-        let mut w = self.w.borrow_mut();
+        let mut w = self.borrow_mut();
 
         let mut width = w.width;
         let mut height = w.height;
@@ -138,7 +138,7 @@ impl Widget {
 
     pub fn putc(&mut self, mut y: u32, mut x: u32, c: char)
     {
-        let mut w = self.w.borrow_mut();
+        let mut w = self.borrow_mut();
 
         let mut width = w.width;
         let mut height = w.height;
@@ -168,7 +168,7 @@ impl Widget {
 
     pub fn clear(&mut self)
     {
-        for c in self.w.borrow_mut().buffer.iter_mut() {
+        for c in self.borrow_mut().buffer.iter_mut() {
             *c = '\0';
         }
     }
@@ -200,21 +200,21 @@ pub struct InnerWidget {
 impl PartialOrd for Widget {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering>
     {
-        Some(self.w.borrow().z_index.cmp(&other.w.borrow().z_index))
+        Some(self.borrow().z_index.cmp(&other.borrow().z_index))
     }
 }
 
 impl Ord for Widget {
     fn cmp(&self, other: &Self) -> Ordering
     {
-        self.w.borrow().z_index.cmp(&other.w.borrow().z_index)
+        self.borrow().z_index.cmp(&other.borrow().z_index)
     }
 }
 
 impl PartialEq for Widget {
     fn eq(&self, other: &Self) -> bool
     {
-        self.w.borrow().z_index == other.w.borrow().z_index
+        self.borrow().z_index == other.borrow().z_index
     }
 }
 

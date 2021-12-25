@@ -17,7 +17,7 @@ pub struct Game {
 impl Game {
     pub fn new() -> Self
     {
-        let mut screen = Screen::new(HEIGHT, WIDTH);
+        let mut screen = Screen::init(HEIGHT, WIDTH);
 
         let mut main_frame =  screen.add_widget(0, 0, HEIGHT, WIDTH);
         main_frame.set_border(('#', '#', '#', '#', '#', '#'));
@@ -76,8 +76,6 @@ impl Game {
 
     pub fn start(&mut self) // TODO
     {
-        self.screen.init();
-
         for _ in 0..60 {
             self.screen.draw();
             self.screen.refresh();
