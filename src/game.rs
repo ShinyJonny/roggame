@@ -21,15 +21,16 @@ impl Game {
 
         let mut main_frame =  screen.add_widget(0, 0, HEIGHT, WIDTH);
         main_frame.set_border(('#', '#', '#', '#', '#', '#'));
-        main_frame.toggle_border();
+        main_frame.toggle_border().unwrap();
         main_frame.set_zindex(0);
 
         let display = screen.add_widget(1, 1, HEIGHT - 2 - 2, WIDTH - 2);
         let mut spacer = screen.add_widget(HEIGHT as u32 - 1 - 2, 1, 1, WIDTH - 2);
         let status_bar = screen.add_widget(HEIGHT as u32 - 1 - 1, 1, 1, WIDTH - 2);
 
-        spacer.set_border(('#', '\0', '#', '#', '\0', '\0'));
-        spacer.toggle_border();
+        for i in 0..spacer.content_width() as u32 {
+            spacer.putc(0, i, '#');
+        }
 
         Self {
             screen,

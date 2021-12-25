@@ -77,15 +77,21 @@ impl Widget {
         self.w.borrow_mut().border_style = border;
     }
 
-    pub fn toggle_border(&mut self)
+    pub fn toggle_border(&mut self) -> Result<(), ()>
     {
         let mut w = self.w.borrow_mut();
+
+        if w.width < 2 || w.height < 2 {
+            return Err(());
+        }
 
         if w.has_border {
             w.has_border = false;
         } else {
             w.has_border = true;
         }
+
+        Ok(())
     }
 
     pub fn set_zindex(&mut self, z_index: u32)
