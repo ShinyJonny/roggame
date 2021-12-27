@@ -7,6 +7,7 @@ mod player;
 mod screen;
 mod widget;
 mod terminal;
+mod macros;
 
 use game::Game;
 

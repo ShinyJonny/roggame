@@ -2,12 +2,7 @@ use std::cmp::Ordering;
 use std::ops::Deref;
 use std::cell::RefCell;
 use std::rc::Rc;
-
-macro_rules! pos {
-    ( $width:expr, $y:expr, $x:expr ) => {
-        $y * $width + $x
-    }
-}
+use crate::pos;
 
 pub struct Widget {
     w: Rc<RefCell<InnerWidget>>,
