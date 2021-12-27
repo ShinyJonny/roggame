@@ -41,7 +41,7 @@ impl Terminal {
                 Event::Key(Key::Char(c)) => {
                     if c.is_alphanumeric() || c.is_ascii_punctuation() || c == ' ' {
                         if input.len() < length - 1 {
-                            self.screen.overlay.putc(self.screen.cursor_y, self.screen.cursor_x, c);
+                            self.screen.overlay.putc(self.screen.cursor.y, self.screen.cursor.x, c);
                             self.screen.advance_cursor(1);
                             input.push(c);
                         }
@@ -49,8 +49,8 @@ impl Terminal {
                 }
                 Event::Key(Key::Backspace) => {
                     if !input.is_empty() {
-                        if self.screen.cursor_x != x {
-                            self.screen.overlay.putc(self.screen.cursor_y, self.screen.cursor_x - 1, BLANK_CHAR);
+                        if self.screen.cursor.x != x {
+                            self.screen.overlay.putc(self.screen.cursor.y, self.screen.cursor.x - 1, BLANK_CHAR);
                             self.screen.advance_cursor(-1);
                         }
                         input.pop();
@@ -63,6 +63,8 @@ impl Terminal {
         }
 
         self.screen.hide_cursor();
+        self.screen.overlay.clear();
+        self.screen.draw();
 
         input
     }

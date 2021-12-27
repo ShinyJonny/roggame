@@ -3,6 +3,7 @@ use std::ops::Deref;
 use std::cell::RefCell;
 use std::rc::Rc;
 use crate::pos;
+use crate::layout::{Justify, Align};
 
 pub struct Widget {
     w: Rc<RefCell<InnerWidget>>,
@@ -59,9 +60,9 @@ impl Widget {
         let w = self.borrow();
 
         if w.has_border {
-            (w.start_y, w.start_x)
-        } else {
             (w.start_y + 1, w.start_x + 1)
+        } else {
+            (w.start_y, w.start_x)
         }
     }
 
@@ -94,7 +95,111 @@ impl Widget {
         self.borrow_mut().z_index = z_index;
     }
 
-    pub fn print(&mut self, mut y: u32, mut x: u32, line: &str)
+    pub fn align_to(&mut self, model: Widget, a: Align)
+    {
+        let mut w = self.borrow_mut();
+
+        let (m_cy, m_cx)  = model.content_yx();
+        let m_cwidth = model.content_width();
+        let m_cheight = model.content_height();
+
+        match a {
+            Align::TopLeft => {
+                w.start_x = m_cx;
+                w.start_y = m_cy;
+            },
+            Align::TopCenter => {
+                if w.width >= m_cwidth {
+                    w.start_x = m_cx;
+                } else {
+                    w.start_x = m_cx + (m_cwidth - w.width) as u32 / 2;
+                }
+
+                w.start_y = m_cy;
+            },
+            Align::TopRight => {
+                if w.width >= m_cwidth {
+                    w.start_x = m_cx;
+                } else {
+                    w.start_x = m_cx + (m_cwidth - w.width) as u32;
+                }
+
+                w.start_y = m_cy;
+            },
+            Align::CenterLeft => {
+                w.start_x = m_cx;
+
+                if w.height >= m_cheight {
+                    w.start_y = m_cy;
+                } else {
+                    w.start_y = m_cy + (m_cheight - w.height) as u32 / 2;
+                }
+            },
+            Align::Center => {
+                if w.width >= m_cwidth {
+                    w.start_x = m_cx;
+                } else {
+                    w.start_x = m_cx + (m_cwidth - w.width) as u32 / 2;
+                }
+
+                if w.height >= m_cheight {
+                    w.start_y = m_cy;
+                } else {
+                    w.start_y = m_cy + (m_cheight - w.height) as u32 / 2;
+                }
+            },
+            Align::CenterRight => {
+                if w.width >= m_cwidth {
+                    w.start_x = m_cx;
+                } else {
+                    w.start_x = m_cx + (m_cwidth - w.width) as u32;
+                }
+
+                if w.height >= m_cheight {
+                    w.start_y = m_cy;
+                } else {
+                    w.start_y = m_cy + (m_cheight - w.height) as u32 / 2;
+                }
+            },
+            Align::BottomLeft => {
+                w.start_x = m_cx;
+
+                if w.height >= m_cheight {
+                    w.start_y = m_cy;
+                } else {
+                    w.start_y = m_cy + (m_cheight - w.height) as u32;
+                }
+            },
+            Align::BottomCenter => {
+                if w.width >= m_cwidth {
+                    w.start_x = m_cx;
+                } else {
+                    w.start_x = m_cx + (m_cwidth - w.width) as u32 / 2;
+                }
+
+                if w.height >= m_cheight {
+                    w.start_y = m_cy;
+                } else {
+                    w.start_y = m_cy + (m_cheight - w.height) as u32;
+                }
+            },
+            Align::BottomRight => {
+                if w.width >= m_cwidth {
+                    w.start_x = m_cx;
+                } else {
+                    w.start_x = m_cx + (m_cwidth - w.width) as u32;
+                }
+
+                if w.height >= m_cheight {
+                    w.start_y = m_cy;
+                } else {
+                    w.start_y = m_cy + (m_cheight - w.height) as u32;
+                }
+            },
+        }
+    }
+
+    pub fn print(&mut self, y: u32, x: u32, line: &str)
     {
         let mut w = self.borrow_mut();
 
@@ -106,8 +211,6 @@ impl Widget {
                 return;
             }
 
-            y += 1;
-            x += 1;
             width -= 2;
             height -= 2;
         } else {
@@ -126,8 +229,83 @@ impl Widget {
             if x as usize + i >= width as usize {
                 break;
             }
-
             w.buffer[pos![ww, y as usize, x as usize + i]] = c;
+        }
+    }
+
+    pub fn print_just(&mut self, j: Justify, line: &str)
+    {
+        match j {
+            Justify::Left(row) => self.print(row, 0, line),
+            Justify::HCenter(row) => {
+                let x: usize;
+                if line.len() >= self.content_width() {
+                    x = 0;
+                } else {
+                    x = (self.content_width() - line.len()) / 2;
+                }
+                self.print(row, x as u32, line);
+            },
+            Justify::Right(row) => {
+                let x: usize;
+                if line.len() >= self.content_width() {
+                    x = 0;
+                } else {
+                    x = self.content_width() - line.len();
+                }
+                self.print(row, x as u32, line);
+            },
+            Justify::Top(col) => self.print(0, col, line),
+            Justify::VCenter(col) => {
+                let mut y = self.content_height();
+                if y > 0 {
+                    y -= 1;
+                }
+                y /= 2;
+                self.print(y as u32, col, line)
+            },
+            Justify::Bottom(col) => {
+                let mut y = self.content_height();
+                if y > 0 {
+                    y -= 1;
+                }
+                self.print(y as u32, col, line)
+            },
+            Justify::TopLeft => self.print_just(Justify::Left(0), line),
+            Justify::TopCenter => self.print_just(Justify::HCenter(0), line),
+            Justify::TopRight => self.print_just(Justify::Right(0), line),
+            Justify::CenterLeft => self.print_just(Justify::VCenter(0), line),
+            Justify::Center => {
+                let mut y = self.content_height();
+                if y > 0 {
+                    y -= 1;
+                }
+                y /= 2;
+                self.print_just(Justify::HCenter(y as u32), line)
+            },
+            Justify::CenterRight => {
+                let mut y = self.content_height();
+                if y > 0 {
+                    y -= 1;
+                }
+                y /= 2;
+                self.print_just(Justify::Right(y as u32), line)
+            },
+            Justify::BottomLeft => self.print_just(Justify::Bottom(0), line),
+            Justify::BottomCenter => {
+                let mut y = self.content_height();
+                if y > 0 {
+                    y -= 1;
+                }
+                self.print_just(Justify::HCenter(y as u32), line)
+            },
+            Justify::BottomRight => {
+                let mut y = self.content_height();
+                if y > 0 {
+                    y -= 1;
+                }
+                self.print_just(Justify::Right(y as u32), line)
+            },
         }
     }
 

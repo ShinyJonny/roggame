@@ -1,6 +1,8 @@
 use crate::map::Map;
 use crate::terminal::Terminal;
 use crate::widget::Widget;
+use crate::layout::{Justify, Align};
+use crate::player::Player;
 
 const WIDTH: usize  = 80;
 const HEIGHT: usize = 24;
@@ -12,6 +14,7 @@ pub struct Game {
     main_frame: Widget,
     spacer: Widget,
     status_bar: Widget,
+    player: Player,
 }
 
 impl Game {
@@ -39,6 +42,7 @@ impl Game {
             main_frame,
             spacer,
             status_bar,
+            player: Player::new()
         }
     }
 
@@ -53,22 +57,15 @@ impl Game {
 
     pub fn init_player(&mut self) // TODO
     {
-        let w = self.main_frame.content_width() as u32;
-        let h = self.main_frame.content_height() as u32;
+        let mut dialog = self.terminal.screen.add_widget(0, 0, 5, 30);
+        dialog.align_to(self.main_frame.share(), Align::Center);
 
-        let msg = "What   is   your name?";
+        dialog.print_just(Justify::TopCenter, "What is your name?");
+        let (dgy, dgx) = dialog.content_yx();
+        self.player.name = self.prompt(dgy + 5 - 1, dgx, 30);
 
-        self.main_frame.print(
-            (h - 5) / 2 + 2,
-            (w - msg.len() as u32) / 2,
-            msg,
-        );
-
-        self.prompt(
-            (h - 5) / 2 + 4 + 2,
-            (w - 30) / 2 + 1,
-            30,
-        );
+        dialog.clear();
+        dialog.print_just(Justify::Center, format!("Welcome, {}.", self.player.name).as_str());
     }
 
     pub fn start(&mut self) // TODO

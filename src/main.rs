@@ -8,6 +8,7 @@ mod screen;
 mod widget;
 mod terminal;
 mod macros;
+mod layout;
 
 use game::Game;
 

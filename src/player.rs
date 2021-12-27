@@ -1,7 +1,7 @@
 use crate::entity;
 
 pub struct Player {
-    name: String,
+    pub name: String,
     x_pos: u32,
     y_pos: u32,
     invent: Vec<entity::Item>,
