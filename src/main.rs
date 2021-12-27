@@ -6,6 +6,7 @@ mod entity;
 mod player;
 mod screen;
 mod widget;
+mod terminal;
 
 use game::Game;
 

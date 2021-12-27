@@ -1,15 +1,15 @@
 use crate::map::Map;
-use crate::screen::Screen;
+use crate::terminal::Terminal;
 use crate::widget::Widget;
 
 const WIDTH: usize  = 80;
 const HEIGHT: usize = 24;
 
 pub struct Game {
-    screen: Screen,
+    terminal: Terminal,
     maps: Vec<Map>,
+    window: Widget,
     main_frame: Widget,
-    display: Widget,
     spacer: Widget,
     status_bar: Widget,
 }
@@ -17,26 +17,26 @@ pub struct Game {
 impl Game {
     pub fn new() -> Self
     {
-        let mut screen = Screen::init(HEIGHT, WIDTH);
+        let mut terminal = Terminal::new(HEIGHT, WIDTH);
 
-        let mut main_frame =  screen.add_widget(0, 0, HEIGHT, WIDTH);
-        main_frame.set_border(('#', '#', '#', '#', '#', '#'));
-        main_frame.toggle_border().unwrap();
-        main_frame.set_zindex(0);
+        let mut window =  terminal.screen.add_widget(0, 0, HEIGHT, WIDTH);
+        window.set_border(('#', '#', '#', '#', '#', '#'));
+        window.toggle_border().unwrap();
+        window.set_zindex(0);
 
-        let display = screen.add_widget(1, 1, HEIGHT - 2 - 2, WIDTH - 2);
-        let mut spacer = screen.add_widget(HEIGHT as u32 - 1 - 2, 1, 1, WIDTH - 2);
-        let status_bar = screen.add_widget(HEIGHT as u32 - 1 - 1, 1, 1, WIDTH - 2);
+        let main_frame = terminal.screen.add_widget(1, 1, HEIGHT - 2 - 2, WIDTH - 2);
+        let mut spacer = terminal.screen.add_widget(HEIGHT as u32 - 1 - 2, 1, 1, WIDTH - 2);
+        let status_bar = terminal.screen.add_widget(HEIGHT as u32 - 1 - 1, 1, 1, WIDTH - 2);
 
         for i in 0..spacer.content_width() as u32 {
             spacer.putc(0, i, '#');
         }
 
         Self {
-            screen,
+            terminal,
             maps: Vec::new(),
+            window,
             main_frame,
-            display,
             spacer,
             status_bar,
         }
@@ -53,34 +53,34 @@ impl Game {
 
     pub fn init_player(&mut self) // TODO
     {
-        let w = self.display.content_width() as u32;
-        let h = self.display.content_height() as u32;
+        let w = self.main_frame.content_width() as u32;
+        let h = self.main_frame.content_height() as u32;
 
-        let msg = "What is your name?";
+        let msg = "What   is   your name?";
 
-        self.display.print(
+        self.main_frame.print(
             (h - 5) / 2 + 2,
             (w - msg.len() as u32) / 2,
             msg,
         );
 
-        let msg = ">_____________________________";
-
-        self.display.print(
+        self.prompt(
             (h - 5) / 2 + 4 + 2,
-            (w - msg.len() as u32) / 2,
-            msg
+            (w - 30) / 2 + 1,
+            30,
         );
-
     }
 
     pub fn start(&mut self) // TODO
     {
         for _ in 0..60 {
-            self.screen.draw();
-            self.screen.refresh();
+            self.terminal.screen.draw();
+            self.terminal.screen.refresh();
         }
+    }
 
-        std::thread::sleep(std::time::Duration::from_millis(3000));
+    fn prompt(&mut self, y: u32, x: u32, length: usize) -> String
+    {
+        self.terminal.input_field(y, x, length)
     }
 }
