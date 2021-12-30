@@ -1,5 +1,5 @@
 use crate::map::Map;
-use crate::terminal::Terminal;
+use crate::screen::Screen;
 use crate::widget::Widget;
 use crate::layout::{Justify, Align};
 use crate::player::Player;
@@ -8,7 +8,7 @@ const WIDTH: usize  = 80;
 const HEIGHT: usize = 24;
 
 pub struct Game {
-    terminal: Terminal,
+    screen: Screen,
     maps: Vec<Map>,
     window: Widget,
     main_frame: Widget,
@@ -20,23 +20,23 @@ pub struct Game {
 impl Game {
     pub fn new() -> Self
     {
-        let mut terminal = Terminal::new(HEIGHT, WIDTH);
+        let mut screen = Screen::init(HEIGHT, WIDTH);
 
-        let mut window =  terminal.screen.add_widget(0, 0, HEIGHT, WIDTH);
+        let mut window =  screen.add_widget(0, 0, HEIGHT, WIDTH);
         window.set_border(('#', '#', '#', '#', '#', '#'));
         window.toggle_border().unwrap();
         window.set_zindex(0);
 
-        let main_frame = terminal.screen.add_widget(1, 1, HEIGHT - 2 - 2, WIDTH - 2);
-        let mut spacer = terminal.screen.add_widget(HEIGHT as u32 - 1 - 2, 1, 1, WIDTH - 2);
-        let status_bar = terminal.screen.add_widget(HEIGHT as u32 - 1 - 1, 1, 1, WIDTH - 2);
+        let main_frame = screen.add_widget(1, 1, HEIGHT - 2 - 2, WIDTH - 2);
+        let mut spacer = screen.add_widget(HEIGHT as u32 - 1 - 2, 1, 1, WIDTH - 2);
+        let status_bar = screen.add_widget(HEIGHT as u32 - 1 - 1, 1, 1, WIDTH - 2);
 
         for i in 0..spacer.content_width() as u32 {
             spacer.putc(0, i, '#');
         }
 
         Self {
-            terminal,
+            screen,
             maps: Vec::new(),
             window,
             main_frame,
@@ -57,7 +57,7 @@ impl Game {
 
     pub fn init_player(&mut self) // TODO
     {
-        let mut dialog = self.terminal.screen.add_widget(0, 0, 5, 30);
+        let mut dialog = self.screen.add_widget(0, 0, 5, 30);
         dialog.align_to(self.main_frame.share(), Align::Center);
 
         dialog.print_just(Justify::TopCenter, "What is your name?");
@@ -71,13 +71,13 @@ impl Game {
     pub fn start(&mut self) // TODO
     {
         for _ in 0..60 {
-            self.terminal.screen.draw();
-            self.terminal.screen.refresh();
+            self.screen.draw();
+            self.screen.refresh();
         }
     }
 
     fn prompt(&mut self, y: u32, x: u32, length: usize) -> String
     {
-        self.terminal.input_field(y, x, length)
+        self.screen.input_field(y, x, length)
     }
 }

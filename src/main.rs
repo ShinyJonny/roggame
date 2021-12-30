@@ -6,7 +6,6 @@ mod entity;
 mod player;
 mod screen;
 mod widget;
-mod terminal;
 mod macros;
 mod layout;
 
