@@ -1,7 +1,7 @@
 use crate::map::Map;
 use crate::screen::Screen;
 use crate::widget::{Widget, InteractiveWidget, OutputWidget, Window, HorizBar, Prompt};
-use crate::layout::{Justify, Aligned};
+use crate::layout::{Justify, Aligned, Align};
 use crate::player::Player;
 
 extern crate termion;
@@ -68,17 +68,15 @@ impl Game {
     pub fn init_player(&mut self) // TODO
     {
         let mut dialog = Window::new(0, 0, 5, 30);
+        let mut prompt = Prompt::new(0, 0, dialog.content_width());
         self.screen.add_widget(&dialog);
+        self.screen.add_widget(&prompt);
         dialog.align_centres(&self.main_frame);
+        prompt.align_to_inner(&dialog, Align::BottomCentre);
+        dialog.show();
+        prompt.show();
 
         dialog.printj(Justify::TopCentre, "What is your name?");
-        dialog.show();
-
-        let (dgy, dgx) = dialog.inner_start_yx();
-        let (dgh, dgw) = (dialog.inner_height(), dialog.inner_width());
-        let mut prompt = Prompt::new(dgy + dgh as u32 - 1, dgx, dgw);
-        self.screen.add_widget(&prompt);
-        prompt.show();
         self.screen.draw();
         self.screen.refresh();
 
