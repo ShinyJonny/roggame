@@ -1,8 +1,11 @@
 use crate::map::Map;
 use crate::screen::Screen;
-use crate::widget::{Widget, Window, HorizBar};
+use crate::widget::{Widget, InteractiveWidget, OutputWidget, Window, HorizBar, Prompt};
 use crate::layout::{Justify, Aligned};
 use crate::player::Player;
+
+extern crate termion;
+use termion::input::TermRead;
 
 const WIDTH: usize  = 80;
 const HEIGHT: usize = 24;
@@ -68,13 +71,35 @@ impl Game {
         self.screen.add_widget(&dialog);
         dialog.align_centres(&self.main_frame);
 
-        dialog.print_just(Justify::TopCentre, "What is your name?");
+        dialog.printj(Justify::TopCentre, "What is your name?");
         dialog.show();
-        //let (dgy, dgx) = dialog.inner_start_yx();
-        //let (dgh, dgw) = (dialog.inner_height(), dialog.inner_width());
-        //self.player.name = self.screen.input_field(dgy + dgh as u32 - 1, dgx, dgw);
-        dialog.clear();
-        dialog.print_just(Justify::Centre, format!("Welcome, {}.", self.player.name).as_str());
+
+        let (dgy, dgx) = dialog.inner_start_yx();
+        let (dgh, dgw) = (dialog.inner_height(), dialog.inner_width());
+        let mut prompt = Prompt::new(dgy + dgh as u32 - 1, dgx, dgw);
+        self.screen.add_widget(&prompt);
+        prompt.show();
+        self.screen.draw();
+        self.screen.refresh();
+
+        let stdin = std::io::stdin();
+        let mut events = stdin.lock().events();
+
+        let mut output_ready = prompt.try_get_output();
+        while output_ready == None {
+            if let Some(e) = events.next() {
+                let e = e.unwrap();
+                prompt.process_event(e);
+                output_ready = prompt.try_get_output();
+                self.screen.draw();
+                self.screen.refresh();
+            }
+        }
+        self.player.name = output_ready.unwrap();
+
+        self.screen.rm_widget(&prompt);
+        self.screen.rm_widget(&dialog);
+        self.main_frame.printj(Justify::Centre, format!("Welcome, {}.", &self.player.name).as_str());
     }
 
     pub fn start(&mut self) // TODO
