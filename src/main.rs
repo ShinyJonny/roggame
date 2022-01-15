@@ -9,14 +9,15 @@ mod widget;
 mod macros;
 mod layout;
 mod misc;
+mod input;
+mod gameui;
 
 use game::Game;
 
 fn main()
 {
     let mut game = Game::new();
-
-    game.load_maps(vec!["map.dat"]);
-    game.init_player();
+    game.splash_screen();
+    game.start_menu();
     game.start();
 }

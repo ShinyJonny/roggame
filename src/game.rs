@@ -1,8 +1,10 @@
 use crate::map::Map;
 use crate::screen::Screen;
-use crate::widget::{Widget, InteractiveWidget, OutputWidget, Window, HorizBar, Prompt};
-use crate::layout::{Justify, Aligned, Align};
+use crate::widget::{Widget, InteractiveWidget, OutputWidget, Window, HorizBar};
+use crate::layout::{Justify, Aligned};
 use crate::player::Player;
+use crate::input;
+use crate::gameui::StartMenu;
 
 extern crate termion;
 use termion::input::TermRead;
@@ -65,46 +67,60 @@ impl Game {
         }
     }
 
-    pub fn init_player(&mut self) // TODO
+    pub fn start_menu(&mut self)
     {
-        let mut dialog = Window::new(0, 0, 5, 30);
-        let mut prompt = Prompt::new(0, 0, dialog.content_width());
-        self.screen.add_widget(&dialog);
-        self.screen.add_widget(&prompt);
-        dialog.align_centres(&self.main_frame);
-        prompt.align_to_inner(&dialog, Align::BottomCentre);
-        dialog.show();
-        prompt.show();
+        let mut menu = StartMenu::new(
+            0, 0, 3, 14 + 2,
+            &vec!["Start New Game", "Load Game", "Exit"]
+        );
+        self.screen.add_widget(&menu);
+        menu.align_centres(&self.main_frame);
+        menu.adjust_pos(0, -2);
+        menu.set_zindex(2);
+        menu.show();
 
-        dialog.printj(Justify::TopCentre, "What is your name?");
         self.screen.draw();
         self.screen.refresh();
 
-        let stdin = std::io::stdin();
-        let mut events = stdin.lock().events();
-
-        let mut output_ready = prompt.try_get_output();
-        while output_ready == None {
-            if let Some(e) = events.next() {
-                let e = e.unwrap();
-                prompt.process_event(e);
-                output_ready = prompt.try_get_output();
-                self.screen.draw();
-                self.screen.refresh();
-            }
-        }
-        self.player.name = output_ready.unwrap();
-
-        self.screen.rm_widget(&prompt);
-        self.screen.rm_widget(&dialog);
-        self.main_frame.printj(Justify::Centre, format!("Welcome, {}.", &self.player.name).as_str());
-    }
-
-    pub fn start(&mut self) // TODO
-    {
-        for _ in 0..60 {
+        let mut output = None;
+        for e in std::io::stdin().events() {
+            menu.process_event(e.unwrap());
             self.screen.draw();
             self.screen.refresh();
+            output = menu.try_get_output();
+            if let Some(_) = output {
+                break;
+            }
         }
+
+        self.screen.rm_widget(&menu);
     }
+
+    pub fn splash_screen(&mut self) {
+        let mut dialog = Window::new(
+            0, 0,
+            6 + (self.main_frame.content_height() as f64 * 0.2) as usize,
+            self.main_frame.content_width()
+        );
+        self.screen.add_widget(&dialog);
+        dialog.align_centres(&self.main_frame);
+        dialog.set_zindex(2);
+        dialog.show();
+
+        dialog.printj(Justify::HCentre(0), " ____              ____                      ");
+        dialog.printj(Justify::HCentre(1), "|  _ \\ ___   __ _ / ___| __ _ _ __ ___   ___ ");
+        dialog.printj(Justify::HCentre(2), "| |_) / _ \\ / _` | |  _ / _` | '_ ` _ \\ / _ \\");
+        dialog.printj(Justify::HCentre(3), "|  _ < (_) | (_| | |_| | (_| | | | | | |  __/");
+        dialog.printj(Justify::HCentre(4), "|_| \\_\\___/ \\__, |\\____|\\__,_|_| |_| |_|\\___|");
+        dialog.printj(Justify::HCentre(5), "            |___/                            ");
+        dialog.printj(Justify::BottomCentre, "Press any key to continue.");
+        self.screen.draw();
+        self.screen.refresh();
+
+        input::getkey();
+
+        self.screen.rm_widget(&dialog);
+    }
+
+    pub fn start(&mut self) {} // TODO
 }

@@ -30,12 +30,9 @@ impl Map {
 
     pub fn size(&self) -> (u32, u32)
     {
-        if self.grid.len() == 0
-        {
+        if self.grid.len() == 0 {
             (0, 0)
-        }
-        else
-        {
+        } else {
             (self.grid.len() as u32, self.grid[0].len() as u32)
         }
     }
