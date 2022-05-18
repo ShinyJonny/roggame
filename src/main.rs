@@ -1,5 +1,4 @@
 #![allow(dead_code)]
-
 mod game;
 mod map;
 mod entity;
@@ -17,7 +16,5 @@ use game::Game;
 fn main()
 {
     let mut game = Game::new();
-    game.splash_screen();
-    game.start_menu();
-    game.start();
+    game.run();
 }

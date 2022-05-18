@@ -1,4 +1,3 @@
-extern crate termion;
 use termion::input::TermRead;
 use termion::event::{Event, Key};
 
