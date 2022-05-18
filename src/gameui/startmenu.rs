@@ -46,8 +46,11 @@ impl StartMenu {
             max + 3 + 3
         };
 
+        let mut menu = Menu::new(y + 1, x + 1, h - 1, w - 4, items, ListStyle::Dummy);
+        menu.show();
+
         let win = Window::new(y, x, h, w);
-        let menu = Menu::new(y + 1, x + 1, h - 1, w - 4, items, ListStyle::Dummy);
+        win.share_inner().add_subwidget(menu.share_inner());
 
         let mut ret = Self {
             win,
@@ -73,7 +76,7 @@ impl StartMenu {
 impl Widget for StartMenu {
     fn share_inner(&self) -> InnerWidget
     {
-        self.menu.share_inner()
+        self.win.share_inner()
     }
 }
 
@@ -96,4 +99,4 @@ impl OutputWidget<usize> for StartMenu {
     }
 }
 
-sub_impl_aligned!(StartMenu, menu);
+sub_impl_aligned!(StartMenu, win, [menu]);
