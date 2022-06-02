@@ -93,12 +93,12 @@ impl InteractiveWidget for StartMenu {
 }
 
 impl OutputWidget<usize> for StartMenu {
-    fn try_get_output(&mut self) -> Option<usize>
+    fn try_get_output(&self) -> Option<usize>
     {
         self.menu.try_get_output()
     }
 
-    fn get_output(self) -> Result<usize, PoisonError<usize>>
+    fn get_output(&self) -> Result<usize, PoisonError<usize>>
     {
         self.menu.get_output()
     }

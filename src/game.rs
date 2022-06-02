@@ -179,7 +179,16 @@ impl Game {
         self.screen.draw();
         self.screen.refresh();
 
-        input::getkey();
+        for e in std::io::stdin().events() {
+            form.process_event(e.unwrap());
+
+            self.screen.draw();
+            self.screen.refresh();
+
+            if let Some(_) = form.try_get_output() {
+                break;
+            }
+        }
     }
 
     fn character_select(&self) {} // TODO

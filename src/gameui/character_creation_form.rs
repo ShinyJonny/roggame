@@ -1,10 +1,12 @@
-//use termion::event::Event;
+use std::collections::HashMap;
+use termion::event::{Event, Key};
 
+use crate::misc::PoisonError;
 use crate::widget::{
     InputLine,
     Widget,
-    //InteractiveWidget,
-    //OutputWidget,
+    InteractiveWidget,
+    OutputWidget,
     InnerWidget,
     Window,
 };
@@ -14,7 +16,6 @@ use crate::layout::{
     Align,
     Justify
 };
-//use crate::misc::PoisonError;
 use crate::sub_impl_aligned;
 
 const FIELD_CAPACITY: usize = 1024;
@@ -25,6 +26,8 @@ pub struct CharacterCreationForm {
     input_win: Window,
     labels: Vec<String>,
     inputs: Vec<InputLine>,
+    selected: usize,
+    output_ready: bool,
 }
 
 impl CharacterCreationForm {
@@ -94,6 +97,8 @@ impl CharacterCreationForm {
             input_win,
             labels,
             inputs,
+            selected: 0,
+            output_ready: false,
         };
         form.draw();
 
@@ -125,6 +130,71 @@ impl Widget for CharacterCreationForm {
     fn share_inner(&self) -> InnerWidget
     {
         self.win.share_inner()
+    }
+}
+
+impl InteractiveWidget for CharacterCreationForm {
+    fn process_event(&mut self, e: Event)
+    {
+        match e {
+            Event::Key(Key::Char('\t')) |
+            Event::Key(Key::Down)=> {
+                if self.selected + 1 != self.inputs.len() {
+                    self.inputs[self.selected].set_inactive();
+                    self.selected += 1;
+                    self.inputs[self.selected].set_active();
+                }
+            },
+            Event::Key(Key::BackTab) |
+            Event::Key(Key::Up) => {
+                if self.selected != 0 {
+                    self.inputs[self.selected].set_inactive();
+                    self.selected -= 1;
+                    self.inputs[self.selected].set_active();
+                }
+            },
+            Event::Key(Key::Char('\n')) => {
+                self.output_ready = true;
+            },
+            _ => {
+                self.inputs[self.selected].process_event(e);
+            }
+        }
+    }
+}
+
+impl OutputWidget<HashMap<String, String>> for CharacterCreationForm {
+    fn try_get_output(&self) -> Option<HashMap<String, String>>
+    {
+        if !self.output_ready {
+            return None;
+        }
+
+        let mut map = HashMap::with_capacity(self.labels.len());
+        for i in 0..self.labels.len() {
+            let key = self.labels[i].clone();
+            let val = self.inputs[i].get_output().unwrap_err().into_inner();
+            map.insert(key, val);
+        }
+
+        Some(map)
+    }
+
+    fn get_output(&self) -> Result<HashMap<String, String>, PoisonError<HashMap<String, String>>>
+    {
+        let mut map = HashMap::with_capacity(self.labels.len());
+        for i in 0..self.labels.len() {
+            let key = self.labels[i].clone();
+            let val = self.inputs[i].get_output().unwrap_err().into_inner();
+            map.insert(key, val);
+        }
+
+
+        if !self.output_ready {
+            return Err(PoisonError::new(map));
+        }
+
+        Ok(map)
     }
 }
 
