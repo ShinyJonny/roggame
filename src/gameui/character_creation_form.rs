@@ -8,9 +8,14 @@ use crate::widget::{
     InnerWidget,
     Window,
 };
-use crate::layout::{Aligned, Align, Justify};
+use crate::layout::{
+    Aligned,
+    Alignable,
+    Align,
+    Justify
+};
 //use crate::misc::PoisonError;
-//use crate::sub_impl_aligned;
+use crate::sub_impl_aligned;
 
 const FIELD_CAPACITY: usize = 1024;
 
@@ -120,5 +125,79 @@ impl Widget for CharacterCreationForm {
     fn share_inner(&self) -> InnerWidget
     {
         self.win.share_inner()
+    }
+}
+
+sub_impl_aligned!(CharacterCreationForm, win);
+
+impl Alignable for CharacterCreationForm {
+    fn align_centres<T: Aligned>(&mut self, anchor: &T)
+    {
+        let (wy, wx) = self.win.outer_start_yx();
+        self.win.align_centres(anchor);
+        let (new_wy, new_wx) = self.win.outer_start_yx();
+        let dy: i32 = new_wy as i32 - wy as i32;
+        let dx: i32 = new_wx as i32 - wx as i32;
+
+        self.label_win.adjust_pos(dy, dx);
+        self.input_win.adjust_pos(dy, dx);
+        for input in &mut self.inputs {
+            input.adjust_pos(dy, dx);
+        }
+    }
+
+    fn align_to_inner<T: Aligned>(&mut self, anchor: &T, a: Align)
+    {
+        let (wy, wx) = self.win.outer_start_yx();
+        self.win.align_to_inner(anchor, a);
+        let (new_wy, new_wx) = self.win.outer_start_yx();
+        let dy: i32 = new_wy as i32 - wy as i32;
+        let dx: i32 = new_wx as i32 - wx as i32;
+
+        self.label_win.adjust_pos(dy, dx);
+        self.input_win.adjust_pos(dy, dx);
+        for input in &mut self.inputs {
+            input.adjust_pos(dy, dx);
+        }
+    }
+
+    fn align_to_outer<T: Aligned>(&mut self, anchor: &T, a: Align)
+    {
+        let (wy, wx) = self.win.outer_start_yx();
+        self.win.align_to_outer(anchor, a);
+        let (new_wy, new_wx) = self.win.outer_start_yx();
+        let dy: i32 = new_wy as i32 - wy as i32;
+        let dx: i32 = new_wx as i32 - wx as i32;
+
+        self.label_win.adjust_pos(dy, dx);
+        self.input_win.adjust_pos(dy, dx);
+        for input in &mut self.inputs {
+            input.adjust_pos(dy, dx);
+        }
+    }
+
+    fn adjust_pos(&mut self, y: i32, x: i32)
+    {
+        self.win.adjust_pos(y, x);
+        self.label_win.adjust_pos(y, x);
+        self.input_win.adjust_pos(y, x);
+        for input in &mut self.inputs {
+            input.adjust_pos(y, x);
+        }
+    }
+
+    fn change_pos(&mut self, y: u32, x: u32)
+    {
+        let (wy, wx) = self.win.outer_start_yx();
+        self.win.change_pos(y, x);
+        let (new_wy, new_wx) = self.win.outer_start_yx();
+        let dy: i32 = new_wy as i32 - wy as i32;
+        let dx: i32 = new_wx as i32 - wx as i32;
+
+        self.label_win.adjust_pos(dy, dx);
+        self.input_win.adjust_pos(dy, dx);
+        for input in &mut self.inputs {
+            input.adjust_pos(dy, dx);
+        }
     }
 }

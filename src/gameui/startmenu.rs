@@ -9,9 +9,14 @@ use crate::widget::{
     Menu,
     ListStyle,
 };
-use crate::layout::{Aligned, Align};
+use crate::layout::{
+    Aligned,
+    Alignable,
+    Align,
+};
 use crate::misc::PoisonError;
 use crate::sub_impl_aligned;
+use crate::sub_impl_alignable;
 
 pub struct StartMenu {
     win: Window,
@@ -99,4 +104,5 @@ impl OutputWidget<usize> for StartMenu {
     }
 }
 
-sub_impl_aligned!(StartMenu, win, [menu]);
+sub_impl_aligned!(StartMenu, win);
+sub_impl_alignable!(StartMenu, win, [menu]);
