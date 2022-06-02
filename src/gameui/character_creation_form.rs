@@ -75,10 +75,13 @@ impl CharacterCreationForm {
             inl.align_to_inner(&input_win, Align::TopLeft);
             inl.adjust_pos(line as i32, 0);
             inl.show();
+            inl.set_inactive();
             input_win.share_inner().add_subwidget(inl.share_inner());
 
             inputs.push(inl)
         }
+
+        inputs[0].set_active();
 
         let mut form = Self {
             win,
