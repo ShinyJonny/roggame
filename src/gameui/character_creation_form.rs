@@ -127,13 +127,13 @@ impl CharacterCreationForm {
     fn draw_labels(&mut self)
     {
         for i in 0..self.labels.len() {
-            self.label_win.printj(Justify::Right(i as u32), &self.labels[i]);
+            self.label_win.printj(&self.labels[i], Justify::Right(i as u32));
         }
     }
 
     fn draw_spacer(&mut self)
     {
-        for i in 0..self.spacer_win.content_height() {
+        for i in 0..self.labels.len() {
             self.spacer_win.putc(i as u32, 0, ':');
         }
     }
