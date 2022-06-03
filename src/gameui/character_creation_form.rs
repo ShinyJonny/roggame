@@ -23,6 +23,7 @@ const FIELD_CAPACITY: usize = 1024;
 pub struct CharacterCreationForm {
     win: Window,
     label_win: Window,
+    spacer_win: Window,
     input_win: Window,
     labels: Vec<String>,
     inputs: Vec<InputLine>,
@@ -56,14 +57,22 @@ impl CharacterCreationForm {
         }
 
         let label_win_x = x + 3;
-        let input_win_x = label_win_x + label_win_width as u32 + 1;
-        let input_win_width = width - (input_win_x - 3) as usize - 3;
+        let spacer_win_x = label_win_x + label_win_width as u32;
+        let spacer_win_width = 2 as usize;
+        let input_win_x = label_win_x + label_win_width as u32 + spacer_win_width as u32;
+        let input_win_width = width - 3 - label_win_width - spacer_win_width as usize - 3;
 
         let mut label_win = Window::new(
             y + 1,
             label_win_x,
             height - 1,
             label_win_width
+        );
+        let mut spacer_win = Window::new(
+            y + 1,
+            spacer_win_x,
+            height - 1,
+            spacer_win_width
         );
         let mut input_win = Window::new(
             y + 1,
@@ -73,8 +82,10 @@ impl CharacterCreationForm {
         );
 
         win.share_inner().add_subwidget(label_win.share_inner());
+        win.share_inner().add_subwidget(spacer_win.share_inner());
         win.share_inner().add_subwidget(input_win.share_inner());
         label_win.show();
+        spacer_win.show();
         input_win.show();
 
         let mut inputs = Vec::new();
@@ -94,6 +105,7 @@ impl CharacterCreationForm {
         let mut form = Self {
             win,
             label_win,
+            spacer_win,
             input_win,
             labels,
             inputs,
@@ -107,14 +119,22 @@ impl CharacterCreationForm {
 
     fn draw(&mut self)
     {
-        self.draw_labels();
         self.draw_border();
+        self.draw_labels();
+        self.draw_spacer();
     }
 
     fn draw_labels(&mut self)
     {
         for i in 0..self.labels.len() {
             self.label_win.printj(Justify::Right(i as u32), &self.labels[i]);
+        }
+    }
+
+    fn draw_spacer(&mut self)
+    {
+        for i in 0..self.spacer_win.content_height() {
+            self.spacer_win.putc(i as u32, 0, ':');
         }
     }
 
@@ -210,6 +230,7 @@ impl Alignable for CharacterCreationForm {
         let dx: i32 = new_wx as i32 - wx as i32;
 
         self.label_win.adjust_pos(dy, dx);
+        self.spacer_win.adjust_pos(dy, dx);
         self.input_win.adjust_pos(dy, dx);
         for input in &mut self.inputs {
             input.adjust_pos(dy, dx);
@@ -225,6 +246,7 @@ impl Alignable for CharacterCreationForm {
         let dx: i32 = new_wx as i32 - wx as i32;
 
         self.label_win.adjust_pos(dy, dx);
+        self.spacer_win.adjust_pos(dy, dx);
         self.input_win.adjust_pos(dy, dx);
         for input in &mut self.inputs {
             input.adjust_pos(dy, dx);
@@ -240,6 +262,7 @@ impl Alignable for CharacterCreationForm {
         let dx: i32 = new_wx as i32 - wx as i32;
 
         self.label_win.adjust_pos(dy, dx);
+        self.spacer_win.adjust_pos(dy, dx);
         self.input_win.adjust_pos(dy, dx);
         for input in &mut self.inputs {
             input.adjust_pos(dy, dx);
@@ -250,6 +273,7 @@ impl Alignable for CharacterCreationForm {
     {
         self.win.adjust_pos(y, x);
         self.label_win.adjust_pos(y, x);
+        self.spacer_win.adjust_pos(y, x);
         self.input_win.adjust_pos(y, x);
         for input in &mut self.inputs {
             input.adjust_pos(y, x);
@@ -265,6 +289,7 @@ impl Alignable for CharacterCreationForm {
         let dx: i32 = new_wx as i32 - wx as i32;
 
         self.label_win.adjust_pos(dy, dx);
+        self.spacer_win.adjust_pos(dy, dx);
         self.input_win.adjust_pos(dy, dx);
         for input in &mut self.inputs {
             input.adjust_pos(dy, dx);
