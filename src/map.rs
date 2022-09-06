@@ -1,73 +1,77 @@
-use byteorder::{LittleEndian, ReadBytesExt};
+use std::io::Read;
+
+use crate::pos;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub struct Cell(pub u8);
 
 pub struct Map {
-    grid: Vec<Vec<u8>>,
-    start_y: u32,
-    start_x: u32,
-    fin_y: u32,
-    fin_x: u32,
+    pub grid: Vec<Cell>,
+    height: usize,
+    width: usize,
 }
 
 impl Map {
-    pub fn new() -> Self
+    pub fn new(height: u32, width: u32) -> Self
     {
         Self {
-            grid: Vec::new(),
-            start_y: 0,
-            start_x: 0,
-            fin_y: 0,
-            fin_x: 0,
+            height: height as usize,
+            width: width as usize,
+            grid: Vec::with_capacity((height * width) as usize),
         }
     }
 
-    pub fn from_file(m_path: &str) -> Result<Self, std::io::Error>
+    pub fn from_reader<R: Read>(reader: &mut R) -> Result<Self, std::io::Error>
     {
-        let mut m = Self::new();
-        m.load(m_path)?;
+        let mut m = Self::new(0, 0);
+        m.load(reader)?;
 
         Ok(m)
     }
 
-    pub fn size(&self) -> (u32, u32)
+    pub fn height(&self) -> usize
     {
-        if self.grid.len() == 0 {
-            (0, 0)
-        } else {
-            (self.grid.len() as u32, self.grid[0].len() as u32)
-        }
+        self.height
     }
 
-    pub fn dump_grid(&self)
+    pub fn width(&self) -> usize
     {
-        for row in &self.grid {
-            for col in row {
-                print!("{:02?}", col);
-            }
-            println!();
-        }
+        self.width
     }
 
-    pub fn load(&mut self, file: &str) -> Result <(), std::io::Error>
+    pub fn load<R: Read>(&mut self, reader: &mut R) -> Result <(), std::io::Error>
     {
-        let mut f = std::io::BufReader::new(std::fs::File::open(file)?);
+        let mut u32_buf = [u8::default(); 4];
 
-        let max_y       = f.read_u32::<LittleEndian>()? as usize;
-        let max_x       = f.read_u32::<LittleEndian>()? as usize;
-        self.start_y    = f.read_u32::<LittleEndian>()?;
-        self.start_x    = f.read_u32::<LittleEndian>()?;
-        self.fin_y      = f.read_u32::<LittleEndian>()?;
-        self.fin_x      = f.read_u32::<LittleEndian>()?;
+        reader.read_exact(&mut u32_buf)?;
+        let height = u32::from_le_bytes(u32_buf) as usize;
+        reader.read_exact(&mut u32_buf)?;
+        let width = u32::from_le_bytes(u32_buf) as usize;
 
-        self.grid = Vec::with_capacity(max_y);
+        self.height = height;
+        self.width = width;
 
-        for row in 0..max_y {
-            self.grid.push(Vec::with_capacity(max_x));
+        reader.read_exact(&mut <[u8; 16]>::default())?;
 
-            for _col in 0..max_x {
-                self.grid[row].push(f.read_u8()?);
-            }
+        let mut buf = vec![u8::default(); height * width];
+        reader.read_exact(&mut buf)?;
+
+        self.grid.resize(height * width, Cell::default());
+
+        for (c, b) in std::iter::zip(&mut self.grid, &buf) {
+            *c = Cell { 0: *b };
         }
 
         Ok(())
+    }
+
+    pub fn dump(&self)
+    {
+        for y in 0..self.height {
+            for x in 0..self.width {
+                eprint!("{}", self.grid[pos!(self.width, y, x)].0 as char);
+            }
+            eprintln!("");
+        }
     }
 }
