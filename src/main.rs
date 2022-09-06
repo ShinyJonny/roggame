@@ -1,7 +1,6 @@
 #![allow(dead_code)]
 mod game;
 mod map;
-mod entity;
 mod player;
 mod screen;
 mod widget;
@@ -10,6 +9,7 @@ mod layout;
 mod misc;
 mod input;
 mod gameui;
+mod style;
 
 use game::Game;
 
