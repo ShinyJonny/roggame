@@ -7,4 +7,4 @@ edition = "2021"
 
 [dependencies]
 termion = "1.5"
-cwinui = { git = "https://github.com/ShinyJonny/cwinui" }
+cwinui = { git = "https://github.com/ShinyJonny/cwinui", tag = "v0.1.0" }

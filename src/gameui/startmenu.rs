@@ -7,7 +7,6 @@ use cwinui::widget::{
     InnerWidget,
     Window,
     Menu,
-    ListStyle,
 };
 use cwinui::layout::{
     Aligned,
@@ -51,7 +50,7 @@ impl StartMenu {
             max + 3 + 3
         };
 
-        let mut menu = Menu::new(y + 1, x + 1, h - 1, w - 4, items, ListStyle::Dummy);
+        let mut menu = Menu::new(y + 1, x + 1, h - 1, w - 4, items);
         menu.show();
 
         let win = Window::new(y, x, h, w);
