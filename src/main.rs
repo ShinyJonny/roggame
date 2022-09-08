@@ -2,14 +2,8 @@
 mod game;
 mod map;
 mod player;
-mod screen;
-mod widget;
-mod macros;
-mod layout;
-mod misc;
 mod input;
 mod gameui;
-mod style;
 
 use game::Game;
 

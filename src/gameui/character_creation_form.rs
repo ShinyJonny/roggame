@@ -1,22 +1,22 @@
 use std::collections::HashMap;
 use termion::event::{Event, Key};
 
-use crate::misc::PoisonError;
-use crate::widget::{
+use cwinui::widget::{
     InputLine,
     Widget,
     InteractiveWidget,
     OutputWidget,
     InnerWidget,
     Window,
+    PoisonError,
 };
-use crate::layout::{
+use cwinui::layout::{
     Aligned,
     Alignable,
     Align,
     Justify
 };
-use crate::sub_impl_aligned;
+use cwinui::sub_impl_aligned;
 
 const FIELD_CAPACITY: usize = 1024;
 

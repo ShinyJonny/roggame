@@ -1,6 +1,6 @@
 use termion::event::Event;
 
-use crate::widget::{
+use cwinui::widget::{
     Widget,
     InteractiveWidget,
     OutputWidget,
@@ -9,14 +9,14 @@ use crate::widget::{
     Menu,
     ListStyle,
 };
-use crate::layout::{
+use cwinui::layout::{
     Aligned,
     Alignable,
     Align,
 };
-use crate::misc::PoisonError;
-use crate::sub_impl_aligned;
-use crate::sub_impl_alignable;
+use cwinui::widget::PoisonError;
+use cwinui::sub_impl_aligned;
+use cwinui::sub_impl_alignable;
 
 pub struct StartMenu {
     win: Window,

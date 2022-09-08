@@ -1,6 +1,6 @@
 use std::io::Read;
 
-use crate::pos;
+use cwinui::pos;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Cell(pub u8);

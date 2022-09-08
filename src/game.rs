@@ -2,20 +2,20 @@ use std::collections::HashMap;
 use termion::input::TermRead;
 use termion::event::{Event, Key};
 
-use crate::screen::Screen;
-use crate::widget::{
+use cwinui::screen::Screen;
+use cwinui::widget::{
     Widget,
     InteractiveWidget,
     OutputWidget,
     Window,
     HorizBar,
 };
-use crate::layout::{
+use cwinui::layout::{
     Justify,
     Alignable,
 };
 use crate::input;
-use crate::pos;
+use cwinui::pos;
 use crate::gameui::{StartMenu, CharacterCreationForm};
 use crate::player::Player;
 use crate::map::Map;
