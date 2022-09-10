@@ -1,4 +1,6 @@
 use std::collections::HashMap;
+use cwinui::style::{Style, Color};
+use cwinui::text::StyledChar;
 use termion::input::TermRead;
 use termion::event::{Event, Key};
 
@@ -125,7 +127,6 @@ impl Game {
         logo.printj("|_| \\_\\___/ \\__, |\\____|\\__,_|_| |_| |_|\\___|", Justify::HCentre(4));
         logo.printj("            |___/                            ", Justify::HCentre(5));
         message.printj("Press any key to continue.", Justify::BottomCentre);
-        self.screen.draw();
         self.screen.refresh();
 
         input::getkey();
@@ -148,7 +149,6 @@ impl Game {
         menu.set_zindex(2);
         menu.show();
 
-        self.screen.draw();
         self.screen.refresh();
 
         let mut output = None;
@@ -156,7 +156,6 @@ impl Game {
         for e in std::io::stdin().events() {
             menu.process_event(e.unwrap());
 
-            self.screen.draw();
             self.screen.refresh();
 
             if let Some(o) = menu.try_get_output() {
@@ -186,7 +185,6 @@ impl Game {
         form.set_zindex(2);
         form.show();
 
-        self.screen.draw();
         self.screen.refresh();
 
         let mut output = HashMap::default();
@@ -194,7 +192,6 @@ impl Game {
         for e in std::io::stdin().events() {
             form.process_event(e.unwrap());
 
-            self.screen.draw();
             self.screen.refresh();
 
             if let Some(o) = form.try_get_output() {
@@ -208,7 +205,6 @@ impl Game {
         self.state.player.pos.x = MAP_WIDTH as u32 / 2;
 
         self.screen.rm_widget(&form);
-        self.screen.draw();
         self.screen.refresh();
     }
 
@@ -225,7 +221,6 @@ impl Game {
 
     fn start(&mut self) {
         self.update_map();
-        self.screen.draw();
         self.screen.refresh();
 
         let mut input = std::io::stdin().events();
@@ -261,7 +256,6 @@ impl Game {
                 if recognised_event {
                     self.update_map();
 
-                    self.screen.draw();
                     self.screen.refresh();
                 }
             } else if let Some(Err(_)) = next {
@@ -281,13 +275,24 @@ impl Game {
                 self.ui.main_frame.putc(
                     y as u32,
                     x as u32,
-                    self.state.map.grid[pos!(map_width, y, x)].0 as char
+                    StyledChar {
+                        c: self.state.map.grid[pos!(map_width, y, x)].0 as char,
+                        style: Style::default().clean(),
+                    }
                 )
             }
         }
 
         // Draw the player
-        self.ui.main_frame.putc(self.state.player.pos.y, self.state.player.pos.x, '@');
+        self.ui.main_frame.putc(
+            self.state.player.pos.y,
+            self.state.player.pos.x,
+            // I really need to implement the IntoStyledChar trait asap :( .
+            StyledChar {
+                c: '@',
+                style: Style::default().fg_color(Color::Red).bg_color(Color::Blue)
+            }
+        );
     }
 }
 

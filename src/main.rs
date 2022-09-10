@@ -1,4 +1,3 @@
-#![allow(dead_code)]
 mod game;
 mod map;
 mod player;
