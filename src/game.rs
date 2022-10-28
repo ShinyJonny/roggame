@@ -1,6 +1,6 @@
 use std::collections::HashMap;
-use cwinui::style::{Style, Color};
-use cwinui::text::StyledChar;
+use cwinui::style::{Color, TextStyle};
+use cwinui::style::WithStyle;
 use termion::input::TermRead;
 use termion::event::{Event, Key};
 
@@ -26,6 +26,10 @@ const HEIGHT: usize = 24;
 const WIDTH: usize  = 80;
 const MAP_HEIGHT: usize = HEIGHT - 4;
 const MAP_WIDTH: usize = WIDTH - 2;
+
+type RgbValue = (u8, u8, u8);
+
+const ACCENT_COLOR: RgbValue = (0x00, 0xd4, 0xaa);
 
 enum StartMenuOption {
     NewGame,
@@ -53,13 +57,13 @@ impl Game {
 
         let mut window =  Window::new(0, 0, HEIGHT, WIDTH);
         let mut main_frame = Window::new(1, 1, HEIGHT - 2 - 2, WIDTH - 2);
-        let mut bar = HorizBar::new(HEIGHT as u32 - 1 - 2, 1, WIDTH - 2);
+        let mut bar = HorizBar::new(HEIGHT as u32 - 1 - 2, 1, WIDTH - 2)
+            .theme('#', '#', '#');
         let mut status_bar = Window::new(HEIGHT as u32 - 1 - 1, 1, 1, WIDTH - 2);
 
-        window.set_border(('#', '#', '#', '#', '#', '#'));
+        window.set_theme('#', '#', '#', '#', '#', '#', '#', '#');
         window.toggle_border().unwrap();
         window.set_zindex(0);
-        bar.set_style(('#', '#', '#'));
 
         screen.add_widget(&window);
         screen.add_widget(&main_frame);
@@ -177,7 +181,10 @@ impl Game {
     fn character_create(&mut self)
     {
         let character_create_entries = [
-            "Name",
+            "Name".with_style(|f|
+                f.fg_color(Color::Rgb(ACCENT_COLOR))
+                 .text_style(TextStyle::BOLD | TextStyle::UNDERLINE)
+            ),
         ];
         let mut form = CharacterCreationForm::new(0, 0, 4, 25, &character_create_entries);
         self.screen.add_widget(&form);
@@ -272,13 +279,12 @@ impl Game {
         // Draw the map itsef
         for y in 0..map_height {
             for x in 0..map_width {
+                let c = self.state.map.grid[pos!(map_width, y, x)].0 as char;
+
                 self.ui.main_frame.putc(
                     y as u32,
                     x as u32,
-                    StyledChar {
-                        c: self.state.map.grid[pos!(map_width, y, x)].0 as char,
-                        style: Style::default().clean(),
-                    }
+                    c,
                 )
             }
         }
@@ -287,11 +293,7 @@ impl Game {
         self.ui.main_frame.putc(
             self.state.player.pos.y,
             self.state.player.pos.x,
-            // I really need to implement the IntoStyledChar trait asap :( .
-            StyledChar {
-                c: '@',
-                style: Style::default().fg_color(Color::Red).bg_color(Color::Blue)
-            }
+            '@'.with_style(|s| s.fg_color(Color::Rgb(ACCENT_COLOR)))
         );
     }
 }

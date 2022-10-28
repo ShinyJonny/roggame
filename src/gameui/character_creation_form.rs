@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use cwinui::style::{OwnedStyledText, StyledText};
 use termion::event::{Event, Key};
 
 use cwinui::widget::{
@@ -18,41 +19,40 @@ use cwinui::layout::{
 };
 use cwinui::sub_impl_aligned;
 
-const FIELD_CAPACITY: usize = 1024;
-
 pub struct CharacterCreationForm {
     win: Window,
     label_win: Window,
     spacer_win: Window,
     input_win: Window,
-    labels: Vec<String>,
+    labels: Vec<OwnedStyledText>,
     inputs: Vec<InputLine>,
     selected: usize,
     output_ready: bool,
 }
 
 impl CharacterCreationForm {
-    pub fn new(
+    pub fn new<'s, T>(
         y: u32,
         x: u32,
         height: usize,
         width: usize,
-        entries: &[&str]
+        entries: &[T]
     ) -> Self
+    where
+        T: Into<StyledText<'s>> + Clone
     {
         let win = Window::new(y, x, height, width);
 
-        let mut labels = Vec::with_capacity(entries.len());
-        for e in entries {
-            labels.push(String::from(*e));
-        }
+        let labels: Vec<OwnedStyledText> = entries.iter()
+            .map(|e| OwnedStyledText::from(e.clone()))
+            .collect();
 
         // FIXME: check that the dimensions are sufficient.
 
-        let mut label_win_width = labels[0].len();
-        for e in &entries[1..] {
-            if e.len() > label_win_width {
-                label_win_width = e.len()
+        let mut label_win_width = labels[0].content.chars().count();
+        for e in &labels[1..] {
+            if e.content.chars().count() > label_win_width {
+                label_win_width = e.content.chars().count()
             }
         }
 
@@ -94,13 +94,13 @@ impl CharacterCreationForm {
             inl.align_to_inner(&input_win, Align::TopLeft);
             inl.adjust_pos(line as i32, 0);
             inl.show();
-            inl.set_inactive();
+            //inl.set_inactive();
             input_win.share_inner().add_subwidget(inl.share_inner());
 
             inputs.push(inl)
         }
 
-        inputs[0].set_active();
+        //inputs[0].set_active();
 
         let mut form = Self {
             win,
@@ -160,17 +160,17 @@ impl InteractiveWidget for CharacterCreationForm {
             Event::Key(Key::Char('\t')) |
             Event::Key(Key::Down)=> {
                 if self.selected + 1 != self.inputs.len() {
-                    self.inputs[self.selected].set_inactive();
+                    //self.inputs[self.selected].set_inactive();
                     self.selected += 1;
-                    self.inputs[self.selected].set_active();
+                    //self.inputs[self.selected].set_active();
                 }
             },
             Event::Key(Key::BackTab) |
             Event::Key(Key::Up) => {
                 if self.selected != 0 {
-                    self.inputs[self.selected].set_inactive();
+                    //self.inputs[self.selected].set_inactive();
                     self.selected -= 1;
-                    self.inputs[self.selected].set_active();
+                    //self.inputs[self.selected].set_active();
                 }
             },
             Event::Key(Key::Char('\n')) => {
@@ -192,7 +192,7 @@ impl OutputWidget<HashMap<String, String>> for CharacterCreationForm {
 
         let mut map = HashMap::with_capacity(self.labels.len());
         for i in 0..self.labels.len() {
-            let key = self.labels[i].clone();
+            let key = self.labels[i].content.clone();
             let val = self.inputs[i].get_output().unwrap_err().into_inner();
             map.insert(key, val);
         }
@@ -204,7 +204,7 @@ impl OutputWidget<HashMap<String, String>> for CharacterCreationForm {
     {
         let mut map = HashMap::with_capacity(self.labels.len());
         for i in 0..self.labels.len() {
-            let key = self.labels[i].clone();
+            let key = self.labels[i].content.clone();
             let val = self.inputs[i].get_output().unwrap_err().into_inner();
             map.insert(key, val);
         }

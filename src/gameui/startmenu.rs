@@ -1,3 +1,4 @@
+use cwinui::style::OwnedStyledText;
 use termion::event::Event;
 
 use cwinui::widget::{
@@ -31,11 +32,7 @@ impl StartMenu {
         items: &[&str]
     ) -> Self
     {
-        let h = if let Some(height) = height {
-            height
-        } else {
-            items.len() + 1 + 1
-        };
+        let h = if let Some(height) = height { height } else { items.len() + 1 + 1 };
         let w = if let Some(width) = width {
             width
         } else {
@@ -50,7 +47,19 @@ impl StartMenu {
             max + 3 + 3
         };
 
-        let mut menu = Menu::new(y + 1, x + 1, h - 1, w - 4, items);
+        let mut menu = Menu::new(y + 1, x + 1, Some((h - 1, w - 4)), items);
+        menu.set_theme(
+            |item| {
+                let mut line = OwnedStyledText::from("  ");
+                line.content.push_str(item);
+                line
+            },
+            |item| {
+                let mut line = OwnedStyledText::from("* ");
+                line.content.push_str(item);
+                line
+            },
+        );
         menu.show();
 
         let win = Window::new(y, x, h, w);
@@ -67,7 +76,7 @@ impl StartMenu {
 
     fn draw_decoration(&mut self)
     {
-        //self.win.print(0, 0, "@");
+        // self.win.print(0, 0, "@");
         for x in 0..self.win.content_width() {
             self.win.print(0, x as u32, "=");
         }
